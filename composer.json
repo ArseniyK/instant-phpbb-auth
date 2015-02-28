@@ -1,0 +1,22 @@
+{
+	"name": "arseniyk/instant",
+	"type": "phpbb-extension",
+	"description": "Allows authentication in phpBB using InstantCMS",
+	"license": "GPLv2",
+	"version": "1",
+	"authors": [
+		{
+			"name": "Arseniy Krasnov",
+			"email": "arseniy@krasnoff.org"
+		}
+	],
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"extra": {
+		"display-name": "Auth Instant",
+		"soft-require": {
+			"phpbb/phpbb": "3.1.*"
+		}
+	}
+}

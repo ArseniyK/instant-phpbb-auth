@@ -3,5 +3,6 @@ services:
         class: arseniyk\instant\auth\provider\instant
         arguments:
             - @dbal.conn
+            - @passwords.manager
         tags:
             - { name: auth.provider }

@@ -4,8 +4,9 @@ namespace arseniyk\instant\auth\provider;
 
 class instant extends \phpbb\auth\provider\base {
 
-    public function __construct(\phpbb\db\driver\driver_interface $db) {
+    public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\passwords\manager $passwords_manager) {
         $this->db = $db;
+		$this->passwords_manager = $passwords_manager;
     }
 
     public function login($username, $password) {
@@ -39,6 +40,13 @@ class instant extends \phpbb\auth\provider\base {
 				$row = $this->db->sql_fetchrow($result);
 				$this->db->sql_freeresult($result);
 				if ($row){
+					$hash = $this->passwords_manager->hash($password);
+					if ($hash != $row["user_password"]) {
+						$sql = 'UPDATE ' . USERS_TABLE . "
+							SET user_password = '" . $this->db->sql_escape($hash) . "'
+							WHERE user_id = {$row['user_id']}";
+						$this->db->sql_query($sql);
+					}
 				   return array(
 						'status'		=> LOGIN_SUCCESS,
 						'error_msg'		=> false,
@@ -76,6 +84,13 @@ class instant extends \phpbb\auth\provider\base {
 			$row = $this->db->sql_fetchrow($result);
 			$this->db->sql_freeresult($result);
 			if ($row) {
+				$hash = $this->passwords_manager->hash($password);
+				if ($hash != $row["user_password"]) {
+					$sql = 'UPDATE ' . USERS_TABLE . "
+						SET user_password = '" . $this->db->sql_escape($hash) . "'
+						WHERE user_id = {$row['user_id']}";
+					$this->db->sql_query($sql);
+				}
 				return $row;
 			}
 			
@@ -111,7 +126,7 @@ class instant extends \phpbb\auth\provider\base {
 		// generate user account data
 		return array(
 			'username'		=> $username,
-			'user_password'	=> '',
+			'user_password'	=> $this->passwords_manager->hash($password),
 			'user_email'	=> $email,
 			'group_id'		=> (int)$row['group_id'],
 			'user_type'		=> USER_NORMAL,			
